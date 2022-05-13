@@ -1,8 +1,8 @@
 using project.Entities;
 using System.Text.RegularExpressions;
-namespace project.controllers
+namespace API.Controllers
 {
-    class EbejicoController
+    public class EbejicoController
     {
         Connection connection = new Connection();
         string[]? data;
@@ -28,7 +28,7 @@ namespace project.controllers
             if (row.Length < 28)
             {
                 flag = false;
-                message += $"El numero de columnas no coincide con la base de datos en la fila {index +1} \n";
+                message += $"El numero de columnas no coincide con la base de datos en la fila {index + 1} \n";
             }
 
             for (int i = 0; i < row.Length; i++)
@@ -36,7 +36,7 @@ namespace project.controllers
                 if (!Regex.IsMatch(row[i], @"^[a-zA-ZñÑ°\s0-9,/:-]+$"))
                 {
                     flag = false;
-                    message += $"{row[i]} Contiene caracteres invalidos en la fila {index +1}";
+                    message += $"En la columna {i} de la fila {index + 1} {row[i]} Contiene caracteres invalidos  ";
                 }
             }
 
@@ -46,13 +46,13 @@ namespace project.controllers
             return ebejico;
         }
 
-        public string Reader()
+        public string Reader(string body)
         {
 
             Delete();
-            var reader = new ReadFile();
-            string file = reader.readFile("./ArchivosPlanos/pepe.XLS").TrimEnd();
-            data = file.Split("\r");
+
+            var file = body.TrimEnd();
+            data = file.Split("\n");
             DateTime fecha = new DateTime();
             string query = "INSERT INTO Ebejico_P VALUES";
 
@@ -100,6 +100,7 @@ namespace project.controllers
                             {
                                 Delete();
                                 connection.InsertException(ex);
+                                return ex.Message;
                             }
                         }
                     }
@@ -107,8 +108,8 @@ namespace project.controllers
                     else
                     {
                         Delete();
-                        Console.WriteLine(content.message);
-                        Console.ReadKey();
+                        // Console.WriteLine(content.message);
+                        // Console.ReadKey();
                         return content.message;
                     }
 
@@ -128,6 +129,7 @@ namespace project.controllers
 
                     Delete();
                     connection.InsertException(ex);
+                    return ex.Message;
 
                 }
             }
@@ -135,6 +137,7 @@ namespace project.controllers
             {
                 connection.InsertException(ex);
                 Delete();
+                return ex.Message;
             }
 
             return "200 ok";
