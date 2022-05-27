@@ -11,7 +11,7 @@ namespace API.Controllers;
 public class ApiController : ControllerBase
 {
 
-    EbejicoController Ebejico = new();
+    Controller controller = new();
 
 
     [HttpGet]
@@ -57,7 +57,7 @@ public class ApiController : ControllerBase
 
             try
             {
-                resultado = Ebejico.Reader(body, municipio.nombreTable, File.separator, File.delete, municipio.NoColumnas, municipio.nombre);
+                resultado = controller.Reader(body, municipio.nombreTable, File.separator, File.delete, municipio.NoColumnas, municipio.nombre);
             }
             catch (System.Exception)
             {

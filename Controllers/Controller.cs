@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using System.Collections;
 namespace API.Controllers
 {
-    public class EbejicoController
+    public class Controller
     {
         Connection connection = new Connection();
         string[]? data;
