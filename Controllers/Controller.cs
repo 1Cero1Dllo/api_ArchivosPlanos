@@ -1,5 +1,6 @@
 using API.Entities;
 using System.Text.RegularExpressions;
+using System.Collections;
 namespace API.Controllers
 {
     public class EbejicoController
@@ -7,6 +8,7 @@ namespace API.Controllers
         Connection connection = new Connection();
         string[]? data;
         string[]? row;
+        ArrayList validated = new ArrayList();
 
         public void Insert(string query)
         {
@@ -19,16 +21,16 @@ namespace API.Controllers
             Insert(query);
         }
 
-        public Content Validate(string[] row, int index)
+        public Content Validate(string[] row, int index, int NoColumnas)
         {
             string message = "";
             bool flag = true;
 
 
-            if (row.Length < 28)
+            if (row.Length != NoColumnas )
             {
                 flag = false;
-                message += $"El numero de columnas no coincide con la base de datos en la fila {index + 1} \n";
+                message += $"El numero de columnas no coincide con la base de datos en la fila {index + 1} (Validar el separador) \n";
             }
 
             for (int i = 0; i < row.Length; i++)
@@ -46,40 +48,33 @@ namespace API.Controllers
             return ebejico;
         }
 
-        public string Reader(string body, string nombreTable, string separator, bool delete)
+        public string Reader(string body, string nombreTable, string separator, bool delete, int NoColumnas,  string nombreMuni)
         {
-
-
-            if (delete)
-            {
-                Delete(nombreTable);
-            }
-
             var file = body.TrimEnd();
             data = file.Split("\n");
-            DateTime fecha = new DateTime();
+
+
+            //DateTime fecha = new DateTime();
             string query = $"INSERT INTO {nombreTable} VALUES";
 
             try
             {
-                int iterador = 1;
-
-
+                int iterador = 0;
                 while (iterador < data.Length)
                 {
                     row = data[iterador].TrimEnd().Split(separator);
                     var content = new Content();
-                    content = Validate(row, iterador);
+                    content = Validate(row, iterador, NoColumnas);
 
                     if (content.flag == true)
                     {
                         for (int i = 0; i < row.Length; i++)
                         {
-                            if (i == 7)
-                            {
-                                fecha = DateTime.Parse(row[i]);
-                                row[i] = fecha.ToString("yyyy-MM-dd");
-                            }
+                            // if (i == 7)
+                            // {
+                            //     fecha = DateTime.Parse(row[i]);
+                            //     row[i] = fecha.ToString("yyyy-MM-dd"); //problema problema
+                            // }
                             if (i == 0)
                             {
                                 query = query + $"('{row[i]}'";
@@ -97,13 +92,11 @@ namespace API.Controllers
                             try
                             {
                                 query = query.TrimEnd(',');
-                                Insert(query);
+                                validated.Add(query);
                                 query = $"INSERT INTO {nombreTable} VALUES";
                             }
                             catch (Exception ex)
                             {
-                                Delete(nombreTable);
-                                connection.InsertException(ex);
                                 return ex.Message;
                             }
                         }
@@ -111,9 +104,6 @@ namespace API.Controllers
 
                     else
                     {
-                        Delete(nombreTable);
-                        // Console.WriteLine(content.message);
-                        // Console.ReadKey();
                         return content.message;
                     }
 
@@ -125,26 +115,30 @@ namespace API.Controllers
                 try
                 {
                     query = query.TrimEnd(',');
-                    Insert(query);
+                    validated.Add(query);
 
                 }
                 catch (Exception ex)
                 {
-
-                    Delete(nombreTable);
-                    connection.InsertException(ex);
                     return ex.Message;
-
                 }
             }
             catch (System.Exception ex)
             {
-                connection.InsertException(ex);
-                Delete(nombreTable);
                 return ex.Message;
             }
+            
+            if (delete)
+            {
+                Delete(nombreTable);
+            }
 
-            return "200 ok";
+            foreach (string item in validated)
+            {
+                Insert(item);
+            }
+
+            return $"Se insertaron los datos correctamente en el {nombreMuni}";
         }
     }
 }

@@ -4,7 +4,7 @@ namespace API.Entities;
 public class Connection
 {
     private string url { get; set; }
-
+    Municipio municipio = new();
     public Connection()
     {
         IConfigurationBuilder config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
@@ -12,31 +12,33 @@ public class Connection
         this.url = configuration["DBConnection"];
     }
 
-    public string ConsultaTabla(string codigoMunicipio, int tipo)
+    public Municipio ConsultaMunicipio(string codigoMunicipio, int tipo)
     {
         try
         {
             using (SqlConnection connection = new SqlConnection(this.url))
             {
                 connection.Open();
-                string query = $"SELECT NombreTable FROM TblMunicipiosxTabla WHERE Municipio ='{codigoMunicipio}' AND TipoImpuesto = '{tipo}' ";
+                string query = $"SELECT T.NombreTable, M.Nombre, (SELECT COUNT(*) FROM information_schema.columns WHERE table_name = (T.NombreTable)) as Columnas FROM TblMunicipiosxTabla T INNER JOIN TblMunicipios M ON T.Municipio = M.CodigoMunicipio WHERE Municipio ='{codigoMunicipio}' AND TipoImpuesto = '{tipo}'";
                 SqlCommand comando = new SqlCommand(query, connection);
                 SqlDataReader reader = comando.ExecuteReader();
 
-                string nombreTable= "";
+               
+
                 while (reader.Read())
                 {
-                    nombreTable = reader.GetString(0);
+                    municipio.nombreTable = reader.GetString(0);
+                    municipio.nombre = reader.GetString(1);
+                    municipio.NoColumnas = reader.GetInt32(2);
                 }
 
-                return nombreTable;
+                return municipio;
             }
 
-
         }
-        catch (Exception ex)
-        {
-            return ex.Message;
+        catch (Exception ex){
+            municipio.Error = ex.Message;
+            return municipio;
         }
 
     }
@@ -56,9 +58,7 @@ public class Connection
         }
         catch (Exception ex)
         {
-
-            Console.WriteLine(ex.Message);
-
+            InsertException(ex);
         }
 
     }

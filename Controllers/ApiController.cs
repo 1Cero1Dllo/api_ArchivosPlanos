@@ -18,7 +18,7 @@ public class ApiController : ControllerBase
     [Route("/")]
     public string index()
     {
-        return $"Hola, te amo";
+        return $"API Archivos planos";
     }
 
 
@@ -41,26 +41,32 @@ public class ApiController : ControllerBase
 
 
         Connection connection = new Connection();
-        string nombreTable = connection.ConsultaTabla(File.codigoMunicipio, File.tipo);
+        Municipio municipio = connection.ConsultaMunicipio(File.codigoMunicipio, File.tipo);
 
-        try
+        if (!string.IsNullOrEmpty(municipio.nombreTable))
         {
-            var valueBytes = System.Convert.FromBase64String(File.base64);
-            body = Encoding.UTF8.GetString(valueBytes);
-        }
-        catch (System.Exception ex)
-        {
-            return Problem(ex.Message);
-        }
+            try
+            {
+                var valueBytes = System.Convert.FromBase64String(File.base64);
+                body = Encoding.UTF8.GetString(valueBytes);
+            }
+            catch (System.Exception ex)
+            {
+                return Problem(ex.Message);
+            }
 
-        try
-        {
-            resultado = Ebejico.Reader(body, nombreTable, File.separator, File.delete);
-        }
-        catch (System.Exception)
-        {
+            try
+            {
+                resultado = Ebejico.Reader(body, municipio.nombreTable, File.separator, File.delete, municipio.NoColumnas, municipio.nombre);
+            }
+            catch (System.Exception)
+            {
 
-            return NotFound();
+                return NotFound();
+            }
+        }
+        else{
+            return Problem("El tipo de tramite no esta habilitado para subir archivos planos");
         }
 
 
@@ -68,6 +74,6 @@ public class ApiController : ControllerBase
     }
 
 
-    
+
 }
 
