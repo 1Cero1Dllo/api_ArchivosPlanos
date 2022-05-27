@@ -13,12 +13,23 @@ public class ApiController : ControllerBase
 
     EbejicoController Ebejico = new();
 
+
+    [HttpGet]
+    [Route("/")]
+    public string index()
+    {
+        return $"Hola, te amo";
+    }
+
+
     [HttpGet]
     [Route("/saludame")]
     public string saludar(string name)
     {
         return $"Hola {name}, te amo";
     }
+
+
 
     [HttpPost]
     [Route("/File")]
@@ -27,6 +38,10 @@ public class ApiController : ControllerBase
 
         string body;
         string resultado;
+
+
+        Connection connection = new Connection();
+        string nombreTable = connection.ConsultaTabla(File.codigoMunicipio, File.tipo);
 
         try
         {
@@ -40,7 +55,7 @@ public class ApiController : ControllerBase
 
         try
         {
-            resultado = Ebejico.Reader(body);
+            resultado = Ebejico.Reader(body, nombreTable, File.separator, File.delete);
         }
         catch (System.Exception)
         {
@@ -51,4 +66,8 @@ public class ApiController : ControllerBase
 
         return Ok(resultado);
     }
+
+
+    
 }
+

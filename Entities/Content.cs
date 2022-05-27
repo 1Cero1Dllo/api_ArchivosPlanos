@@ -1,4 +1,4 @@
-namespace project.Entities
+namespace API.Entities
 {
     public class Content
     {

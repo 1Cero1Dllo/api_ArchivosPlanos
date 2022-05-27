@@ -1,4 +1,4 @@
-using project.Entities;
+using API.Entities;
 using System.Text.RegularExpressions;
 namespace API.Controllers
 {
@@ -13,9 +13,9 @@ namespace API.Controllers
             connection.connection(query);
         }
 
-        public void Delete()
+        public void Delete(string nombreTable)
         {
-            string query = "DELETE Ebejico_P";
+            string query = $"DELETE {nombreTable}";
             Insert(query);
         }
 
@@ -46,15 +46,19 @@ namespace API.Controllers
             return ebejico;
         }
 
-        public string Reader(string body)
+        public string Reader(string body, string nombreTable, string separator, bool delete)
         {
 
-            Delete();
+
+            if (delete)
+            {
+                Delete(nombreTable);
+            }
 
             var file = body.TrimEnd();
             data = file.Split("\n");
             DateTime fecha = new DateTime();
-            string query = "INSERT INTO Ebejico_P VALUES";
+            string query = $"INSERT INTO {nombreTable} VALUES";
 
             try
             {
@@ -63,7 +67,7 @@ namespace API.Controllers
 
                 while (iterador < data.Length)
                 {
-                    row = data[iterador].TrimEnd().Split('\t');
+                    row = data[iterador].TrimEnd().Split(separator);
                     var content = new Content();
                     content = Validate(row, iterador);
 
@@ -94,11 +98,11 @@ namespace API.Controllers
                             {
                                 query = query.TrimEnd(',');
                                 Insert(query);
-                                query = "INSERT INTO Ebejico_P VALUES";
+                                query = $"INSERT INTO {nombreTable} VALUES";
                             }
                             catch (Exception ex)
                             {
-                                Delete();
+                                Delete(nombreTable);
                                 connection.InsertException(ex);
                                 return ex.Message;
                             }
@@ -107,7 +111,7 @@ namespace API.Controllers
 
                     else
                     {
-                        Delete();
+                        Delete(nombreTable);
                         // Console.WriteLine(content.message);
                         // Console.ReadKey();
                         return content.message;
@@ -127,7 +131,7 @@ namespace API.Controllers
                 catch (Exception ex)
                 {
 
-                    Delete();
+                    Delete(nombreTable);
                     connection.InsertException(ex);
                     return ex.Message;
 
@@ -136,7 +140,7 @@ namespace API.Controllers
             catch (System.Exception ex)
             {
                 connection.InsertException(ex);
-                Delete();
+                Delete(nombreTable);
                 return ex.Message;
             }
 

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "YJLaf4vY8TRrKt0mYCLv0lakWzD1OdzWUk+h/mI73hHGyjUF6fnUC/9BN1flb3aX/Uf89ZlZGHwowS5BNzVYtA==",
+  "dgSpecHash": "AVGNmjdKSe5eqVV38Ny07DVn6CS4QohpjOolvjW/cctHWL6VgVROl/3NQghHeLlHBeZhhMujcjrq6NadONaacg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Wylder\\Desktop\\API\\API.csproj",
+  "projectFilePath": "C:\\Users\\Wylder\\Desktop\\Api_archivos_planos\\API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Wylder\\.nuget\\packages\\microsoft.extensions.apidescription.server\\3.0.0\\microsoft.extensions.apidescription.server.3.0.0.nupkg.sha512",
     "C:\\Users\\Wylder\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
