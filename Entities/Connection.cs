@@ -5,6 +5,7 @@ public class Connection
 {
     private string url { get; set; }
     Municipio municipio = new();
+
     public Connection()
     {
         IConfigurationBuilder config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
@@ -23,20 +24,21 @@ public class Connection
                 SqlCommand comando = new SqlCommand(query, connection);
                 SqlDataReader reader = comando.ExecuteReader();
 
-               
+
 
                 while (reader.Read())
                 {
-                    municipio.nombreTable = reader.GetString(0);
+                    municipio.nombreTable.Add(reader.GetString(0));
                     municipio.nombre = reader.GetString(1);
-                    municipio.NoColumnas = reader.GetInt32(2);
+                    municipio.NoColumnas.Add(reader.GetInt32(2));
                 }
-
+                
                 return municipio;
             }
 
         }
-        catch (Exception ex){
+        catch (Exception ex)
+        {
             municipio.Error = ex.Message;
             return municipio;
         }
@@ -77,5 +79,4 @@ public class Connection
         }
 
     }
-
 }

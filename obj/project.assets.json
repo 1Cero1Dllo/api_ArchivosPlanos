@@ -694,11 +694,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Wylder\\Desktop\\Api_archivos_planos\\API.csproj",
+      "projectUniqueName": "C:\\Users\\Wylder\\Documents\\1cero1\\ArchivosPlanos\\Api_archivos_planos\\API.csproj",
       "projectName": "API",
-      "projectPath": "C:\\Users\\Wylder\\Desktop\\Api_archivos_planos\\API.csproj",
+      "projectPath": "C:\\Users\\Wylder\\Documents\\1cero1\\ArchivosPlanos\\Api_archivos_planos\\API.csproj",
       "packagesPath": "C:\\Users\\Wylder\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Wylder\\Desktop\\Api_archivos_planos\\obj\\",
+      "outputPath": "C:\\Users\\Wylder\\Documents\\1cero1\\ArchivosPlanos\\Api_archivos_planos\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

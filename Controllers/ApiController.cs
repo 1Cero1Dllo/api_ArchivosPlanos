@@ -43,7 +43,7 @@ public class ApiController : ControllerBase
         Connection connection = new Connection();
         Municipio municipio = connection.ConsultaMunicipio(File.codigoMunicipio, File.tipo);
 
-        if (!string.IsNullOrEmpty(municipio.nombreTable))
+        if (!string.IsNullOrEmpty(municipio.nombreTable.ToString()))
         {
             try
             {
@@ -57,15 +57,23 @@ public class ApiController : ControllerBase
 
             try
             {
-                resultado = controller.Reader(body, municipio.nombreTable, File.separator, File.delete, municipio.NoColumnas, municipio.nombre);
+                if (File.codigoMunicipio == "8001000588")
+                {
+                    resultado = controller.ReaderExperimental(body, municipio, File);
+                }
+                else
+                {
+                    resultado = controller.Reader(body, municipio, File);
+                }
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
 
-                return NotFound();
+                return NotFound(ex.Message);
             }
         }
-        else{
+        else
+        {
             return Problem("El tipo de tramite no esta habilitado para subir archivos planos");
         }
 
@@ -73,7 +81,8 @@ public class ApiController : ControllerBase
         return Ok(resultado);
     }
 
-
-
 }
+
+
+
 

@@ -1,10 +1,21 @@
-namespace API.Entities;
-public class Municipio
+using System.Collections;
+
+namespace API.Entities
 {
-    public string nombre { get; set; }
-    public int NoColumnas {get; set;}
-    public string nombreTable {get; set;}
+    public class Municipio
+    {
+        public Municipio()
+        {
+            this.nombreTable = new ArrayList();
+            this.NoColumnas = new ArrayList();
+        }
 
-    public string Error {get; set;}
+        public string nombre { get; set; }
+        public ArrayList NoColumnas { get; set; }
 
+        public ArrayList nombreTable { get; set; }
+
+        public string Error { get; set; }
+
+    }
 }
