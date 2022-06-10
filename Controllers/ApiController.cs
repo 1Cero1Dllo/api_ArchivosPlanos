@@ -22,15 +22,6 @@ public class ApiController : ControllerBase
     }
 
 
-    [HttpGet]
-    [Route("/saludame")]
-    public string saludar(string name)
-    {
-        return $"Hola {name}, te amo";
-    }
-
-
-
     [HttpPost]
     [Route("/File")]
     public IActionResult ReadFile(AttachFile File)
@@ -57,7 +48,7 @@ public class ApiController : ControllerBase
 
             try
             {
-                if (File.codigoMunicipio == "8001000588")
+                if (File.codigoMunicipio == "8001000588" || File.codigoMunicipio == "8907020342" )
                 {
                     resultado = controller.ReaderExperimental(body, municipio, File);
                 }

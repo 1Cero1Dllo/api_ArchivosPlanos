@@ -204,7 +204,7 @@ namespace API.Controllers
                 Tabla1[i] = tabla1[i].ToString().TrimEnd('|');
             }
 
-            string regreso = SetRows(municipio.nombreTable[0].ToString(), municipio, (int)municipio.NoColumnas[0], files, Tabla1);
+            string regreso1 = SetRows(municipio.nombreTable[0].ToString(), municipio, (int)municipio.NoColumnas[0], files, Tabla1);
 
             //Tabla2
             string[] Tabla2 = new string[tabla2.Count];
@@ -232,7 +232,7 @@ namespace API.Controllers
                 ;
             }
 
-            regreso += SetRows(municipio.nombreTable[1].ToString(), municipio, (int)municipio.NoColumnas[1], files, Tabla2);
+            string regreso2 = SetRows(municipio.nombreTable[1].ToString(), municipio, (int)municipio.NoColumnas[1], files, Tabla2);
 
 
             //Tabla3
@@ -243,7 +243,7 @@ namespace API.Controllers
                 Tabla3[i] = tabla3[i].ToString().TrimEnd('|');
             }
 
-            regreso += SetRows(municipio.nombreTable[2].ToString(), municipio, (int)municipio.NoColumnas[2], files, Tabla3);
+            string regreso3 = SetRows(municipio.nombreTable[2].ToString(), municipio, (int)municipio.NoColumnas[2], files, Tabla3);
 
             //Tabla4
             string[] Tabla4 = new string[tabla4.Count];
@@ -253,7 +253,7 @@ namespace API.Controllers
                 Tabla4[i] = tabla4[i].ToString().TrimEnd('|');
             }
 
-            regreso += SetRows(municipio.nombreTable[3].ToString(), municipio, (int)municipio.NoColumnas[3], files, Tabla4);
+            string regreso4 = SetRows(municipio.nombreTable[3].ToString(), municipio, (int)municipio.NoColumnas[3], files, Tabla4);
 
 
             //Tabla5
@@ -264,10 +264,20 @@ namespace API.Controllers
                 Tabla5[i] = tabla5[i].ToString().TrimEnd('|');
             }
 
-            regreso += SetRows(municipio.nombreTable[4].ToString(), municipio, (int)municipio.NoColumnas[4], files, Tabla5);
+            string regreso5 = SetRows(municipio.nombreTable[4].ToString(), municipio, (int)municipio.NoColumnas[4], files, Tabla5);
 
+            //Tabla6
+            string[] Tabla6 = new string[tabla6.Count];
 
-            return regreso;
+            for (int i = 0; i < Tabla6.Length; i++)
+            {
+                Tabla6[i] = tabla6[i].ToString().TrimEnd('|');
+            }
+
+            string regreso6 = SetRows(municipio.nombreTable[5].ToString(), municipio, (int)municipio.NoColumnas[5], files, Tabla6);
+
+            return $" Tabla 1 \n {regreso1} \n Tabla 2 \n {regreso2} \n Tabla 3 \n {regreso3} \n Tabla 4 \n {regreso4} \n"
+            + $" Tabla 5 \n {regreso5} \n Tabla 6 \n {regreso6} \n";
         }
     }
 }
