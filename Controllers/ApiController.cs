@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using API.Entities;
 using System.Text;
-
+using System.Data;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace API.Controllers;
 
@@ -29,6 +30,7 @@ public class ApiController : ControllerBase
 
         string body;
         string resultado;
+        byte[] valueBytes;
 
 
         Connection connection = new Connection();
@@ -38,7 +40,7 @@ public class ApiController : ControllerBase
         {
             try
             {
-                var valueBytes = System.Convert.FromBase64String(File.base64);
+                valueBytes = System.Convert.FromBase64String(File.base64);
                 body = Encoding.UTF8.GetString(valueBytes);
             }
             catch (System.Exception ex)
@@ -48,13 +50,17 @@ public class ApiController : ControllerBase
 
             try
             {
-                if (File.codigoMunicipio == "8001000588" || File.codigoMunicipio == "8907020342" )
+                if (File.codigoMunicipio == "8001000588" || File.codigoMunicipio == "8907020342")
                 {
                     resultado = controller.ReaderExperimental(body, municipio, File);
                 }
+                else if (File.codigoMunicipio == "8912006863")
+                {
+                    resultado = controller.ReaderEmpopasto(body, municipio, File);
+                }
                 else
                 {
-                    resultado = controller.Reader(body, municipio, File);
+                    resultado = controller.ReaderEmpopasto(body, municipio, File);
                 }
             }
             catch (System.Exception ex)

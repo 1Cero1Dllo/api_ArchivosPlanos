@@ -1,6 +1,7 @@
 using API.Entities;
 using System.Text.RegularExpressions;
 using System.Collections;
+using System.Data;
 namespace API.Controllers
 {
     public class Controller
@@ -35,12 +36,12 @@ namespace API.Controllers
 
             for (int i = 0; i < row.Length; i++)
             {
-                if (!Regex.IsMatch(row[i], @"^[a-zA-ZñÑ°.=*?()&'\s0-9,/:-]+$"))
+                if (!Regex.IsMatch(row[i], @"^[a-zA-ZñÑ°.=*?()&-_#'\s0-9,/:-]+$"))
                 {
                     if (!string.IsNullOrEmpty(row[i]))
                     {
                         flag = false;
-                        message += $"En la columna {i} de la fila {index + 1} {row[i]} Contiene caracteres invalidos  ";
+                        message += $"En la columna {i + 1} de la fila {index + 1} {row[i]} Contiene caracteres invalidos  ";
                     }
 
                 }
@@ -76,28 +77,21 @@ namespace API.Controllers
                 int iterador = 0;
                 while (iterador < data.Length)
                 {
+
+
                     row = data[iterador].TrimEnd().Split(files.separator);
                     var content = new Content();
+                    content.flag = true;
                     content = Validate(row, iterador, NoColumnas);
+
 
                     if (content.flag == true)
                     {
-                        for (int i = 0; i < row.Length; i++)
+                        int i = 0;
+                        foreach (var item in row)
                         {
-                            // if (i == 7)
-                            // {
-                            //     fecha = DateTime.Parse(row[i]);
-                            //     row[i] = fecha.ToString("yyyy-MM-dd"); //problema problema
-                            // }
-                            if (i == 0)
-                            {
-                                query = query + $"('{row[i]}'";
-                            }
-                            else
-                            {
-                                query = query + $",'{row[i]}'";
-                            }
-
+                            query = i == 0 ? query + $"('{row[i]}'" : query + $",'{row[i]}'";
+                            i++;
                         }
                         query = query + "),";
 
@@ -134,11 +128,13 @@ namespace API.Controllers
                 }
                 catch (Exception ex)
                 {
+                    connection.InsertException(ex);
                     return ex.Message;
                 }
             }
             catch (System.Exception ex)
             {
+                connection.InsertException(ex);
                 return ex.Message;
             }
 
@@ -228,7 +224,7 @@ namespace API.Controllers
                 Fechas3.Add(div[7].Substring(54, 8));
 
 
-                Tabla2[i] = div[0] + files.separator + Totales1[i] + files.separator + Fechas1[i] + files.separator + Totales2[i] + files.separator + Fechas2[i] + files.separator + Totales3[i] + files.separator + Fechas3[i];
+                Tabla2[i] = div[2] + files.separator + Totales1[i] + files.separator + Fechas1[i] + files.separator + Totales2[i] + files.separator + Fechas2[i] + files.separator + Totales3[i] + files.separator + Fechas3[i];
                 ;
             }
 
@@ -279,5 +275,45 @@ namespace API.Controllers
             return $" Tabla 1 \n {regreso1} \n Tabla 2 \n {regreso2} \n Tabla 3 \n {regreso3} \n Tabla 4 \n {regreso4} \n"
             + $" Tabla 5 \n {regreso5} \n Tabla 6 \n {regreso6} \n";
         }
+
+        public string ReaderEmpopasto(string body, Municipio municipio, AttachFile files)
+        {
+
+            if (files.delete == true)
+            {
+                Delete(municipio.nombreTable[0].ToString());
+            }
+            var Res = connection.ConsultaTabla(municipio);
+            DataTable tbl = Res.Data;
+
+            var file = body.TrimEnd();
+            data = file.Split("\n");
+            foreach (string line in data)
+            {
+                var cols = line.Split(files.separator);
+
+                DataRow dr = tbl.NewRow();
+                for (int i = 0; i < int.Parse(municipio.NoColumnas[0].ToString()); i++)
+                {
+                    dr[i] = cols[i];
+                }
+
+                tbl.Rows.Add(dr);
+            }
+            try
+            {
+                connection.BulkInsert(municipio, tbl);
+            }
+            catch (System.Exception ex)
+            {
+                     connection.InsertException(ex);
+                return ex.Message;
+            }
+
+
+            return Res.Mensaje;
+        }
     }
+
+
 }
