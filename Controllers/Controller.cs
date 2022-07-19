@@ -288,17 +288,31 @@ namespace API.Controllers
 
             var file = body.TrimEnd();
             data = file.Split("\n");
+            var linea = 0;
             foreach (string line in data)
             {
-                var cols = line.Split(files.separator);
-
-                DataRow dr = tbl.NewRow();
-                for (int i = 0; i < int.Parse(municipio.NoColumnas[0].ToString()); i++)
+                try
                 {
-                    dr[i] = cols[i];
+                    var cols = line.Split(files.separator);
+                    DataRow dr = tbl.NewRow();
+
+                    for (int i = 0; i < int.Parse(municipio.NoColumnas[0].ToString()); i++)
+                    {
+                        if (cols.Length > i)
+                        {
+                            dr[i] = cols[i].Trim();
+                        }
+                    }
+
+                    tbl.Rows.Add(dr);
+                }
+                catch (System.Exception ex)
+                {
+                    connection.InsertException(ex, files.codigoMunicipio);
+                    var cols = line.Split(files.separator);
+                    return ex.Message;
                 }
 
-                tbl.Rows.Add(dr);
             }
             try
             {
@@ -306,7 +320,7 @@ namespace API.Controllers
             }
             catch (System.Exception ex)
             {
-                     connection.InsertException(ex);
+                connection.InsertException(ex);
                 return ex.Message;
             }
 
