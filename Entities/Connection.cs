@@ -14,7 +14,7 @@ public class Connection
         this.url = configuration["DBConnection"];
     }
 
-    public Respuesta ConsultaTabla(Municipio municipio)
+    public Respuesta Consulta(string Query)
     {
         Respuesta res = new();
         try
@@ -22,7 +22,32 @@ public class Connection
             using (SqlConnection connection = new SqlConnection(this.url))
             {
                 connection.Open();
-                string query = $"SELECT TOP 0 * FROM {municipio.nombreTable[0]}";
+                string query = $"{Query}";
+                SqlCommand comando = new SqlCommand(query, connection);
+                SqlDataReader reader = comando.ExecuteReader();
+                var dataTable = new DataTable();
+                dataTable.Load(reader);
+                res.Data = dataTable;
+                res.Mensaje = $"200 ok";
+                return res;
+            }
+
+        }
+        catch (System.Exception)
+        {
+            
+            throw;
+        }
+    }
+    public Respuesta ConsultaTabla(Municipio municipio, string NombreTable)
+    {
+        Respuesta res = new();
+        try
+        {
+            using (SqlConnection connection = new SqlConnection(this.url))
+            {
+                connection.Open();
+                string query = $"SELECT TOP 0 * FROM {NombreTable}";
                 SqlCommand comando = new SqlCommand(query, connection);
                 SqlDataReader reader = comando.ExecuteReader();
                 var dataTable = new DataTable();
@@ -41,13 +66,13 @@ public class Connection
         }
     }
 
-    public void BulkInsert(Municipio municipio, DataTable dataTable)
+    public void BulkInsert(string NombreTabla, DataTable dataTable)
     {
         using (SqlConnection connection = new SqlConnection(this.url))
         {
             connection.Open();
             SqlBulkCopy bulkCopy = new SqlBulkCopy(connection);
-            bulkCopy.DestinationTableName = municipio.nombreTable[0].ToString();
+            bulkCopy.DestinationTableName = NombreTabla;
             bulkCopy.WriteToServer(dataTable);
         }
 
@@ -84,7 +109,7 @@ public class Connection
         }
 
     }
-    public void connection(string query)
+    public void connection(string query, string codigoMunicipio)
     {
 
         try
@@ -100,7 +125,7 @@ public class Connection
         }
         catch (Exception ex)
         {
-            InsertException(ex);
+            InsertException(ex, codigoMunicipio);
         }
 
     }

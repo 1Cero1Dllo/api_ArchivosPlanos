@@ -11,9 +11,11 @@ namespace API.Controllers
         string[]? row;
         ArrayList validated = new ArrayList();
 
+        AttachFile archivo = new AttachFile();
+
         public void Insert(string query)
         {
-            connection.connection(query);
+            connection.connection(query, archivo.codigoMunicipio);
         }
 
         public void Delete(string nombreTable)
@@ -54,16 +56,16 @@ namespace API.Controllers
         }
 
 
-        public string Reader(string body, Municipio municipio, AttachFile files)
-        {
-            var file = body.TrimEnd();
-            data = file.Split("\n");
+        // public string Reader(string body, Municipio municipio, AttachFile files)
+        // {
+        //     var file = body.TrimEnd();
+        //     data = file.Split("\n");
 
-            string regreso = SetRows(municipio.nombreTable[0].ToString(), municipio, (int)municipio.NoColumnas[0], files, data);
+        //     string regreso = SetRows(municipio.nombreTable[0].ToString(), municipio, (int)municipio.NoColumnas[0], files, data);
 
-            return regreso;
+        //     return regreso;
 
-        }
+        // }
 
 
 
@@ -128,13 +130,13 @@ namespace API.Controllers
                 }
                 catch (Exception ex)
                 {
-                    connection.InsertException(ex);
+                    connection.InsertException(ex, files.codigoMunicipio);
                     return ex.Message;
                 }
             }
             catch (System.Exception ex)
             {
-                connection.InsertException(ex);
+                connection.InsertException(ex, files.codigoMunicipio);
                 return ex.Message;
             }
 
@@ -154,6 +156,17 @@ namespace API.Controllers
 
         public string ReaderExperimental(string body, Municipio municipio, AttachFile files)
         {
+
+            if (files.delete == true)
+            {
+                foreach (var item in municipio.nombreTable)
+                {
+                    Delete(item.ToString());
+                }
+            }
+
+
+            archivo = files;
             var file = body.TrimEnd();
             data = file.Split("\n");
 
@@ -276,19 +289,102 @@ namespace API.Controllers
             + $" Tabla 5 \n {regreso5} \n Tabla 6 \n {regreso6} \n";
         }
 
-        public string ReaderEmpopasto(string body, Municipio municipio, AttachFile files)
+        public string ReaderExperimentalAcuerdos(string body, Municipio municipio, AttachFile files)
         {
+
+            archivo = files;
+            var file = body.TrimEnd();
+            data = file.Split("\n");
+
+            ArrayList tabla1 = new();
+            ArrayList tabla2 = new();
+
+            foreach (var item in data)
+            {
+                if (item[1] == '1')
+                {
+                    tabla1.Add(item);
+                }
+                else if (item[1] == '4')
+                {
+                    tabla2.Add(item);
+                }
+            }
 
             if (files.delete == true)
             {
                 Delete(municipio.nombreTable[0].ToString());
+                Delete(municipio.nombreTable[1].ToString());
             }
-            var Res = connection.ConsultaTabla(municipio);
+
+            string respuesta = Insert(tabla1, municipio, municipio.nombreTable[0].ToString(), files, (int)municipio.NoColumnas[0]);
+            respuesta += Insert(tabla2, municipio, municipio.nombreTable[1].ToString(), files, (int)municipio.NoColumnas[1]);
+
+            return respuesta;
+
+        }
+        public string Insert(ArrayList tabla, Municipio municipio, string NombreTabla, AttachFile files, int NumeroColumnas)
+        {
+
+            archivo = files;
+            var Res = connection.ConsultaTabla(municipio, NombreTabla);
             DataTable tbl = Res.Data;
 
-            var file = body.TrimEnd();
-            data = file.Split("\n");
-            var linea = 0;
+            foreach (string line in tabla)
+            {
+                try
+                {
+                    var cols = line.Split(files.separator);
+                    DataRow dr = tbl.NewRow();
+
+                    for (int i = 0; i < NumeroColumnas; i++)
+                    {
+                        if (cols.Length > i)
+                        {
+                            dr[i] = cols[i].Trim();
+                        }
+                    }
+
+                    tbl.Rows.Add(dr);
+                }
+                catch (System.Exception ex)
+                {
+                    connection.InsertException(ex, files.codigoMunicipio);
+                    var cols = line.Split(files.separator);
+                    return ex.Message;
+                }
+
+            }
+            try
+            {
+                connection.BulkInsert(NombreTabla, tbl);
+            }
+            catch (System.Exception ex)
+            {
+                connection.InsertException(ex);
+                return ex.Message;
+            }
+
+
+            return Res.Mensaje;
+
+        }
+
+
+        public string ReaderEmpopasto(string body, Municipio municipio, AttachFile files)
+        {
+
+            archivo = files;
+            if (files.delete == true)
+            {
+                Delete(municipio.nombreTable[0].ToString());
+            }
+
+
+            var Res = connection.ConsultaTabla(municipio, municipio.nombreTable[0].ToString());
+            DataTable tbl = Res.Data;
+
+
             foreach (string line in data)
             {
                 try
@@ -316,7 +412,7 @@ namespace API.Controllers
             }
             try
             {
-                connection.BulkInsert(municipio, tbl);
+                connection.BulkInsert(municipio.nombreTable[0].ToString(), tbl);
             }
             catch (System.Exception ex)
             {

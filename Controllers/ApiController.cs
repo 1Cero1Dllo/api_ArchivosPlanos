@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using API.Entities;
+using Newtonsoft.Json;
 using System.Text;
 using System.Data;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -20,6 +21,17 @@ public class ApiController : ControllerBase
     public string index()
     {
         return $"API Archivos planos";
+    }
+
+    [HttpGet]
+    [Route("/GetImpuestos")]
+    public IActionResult GetImpuestos()
+    {
+        Connection connection = new();
+        string query = $"SELECT * FROM tblImpuestos";
+        var res = connection.Consulta(query);
+        string json = JsonConvert.SerializeObject(res);
+        return Ok(json);
     }
 
 
@@ -52,7 +64,15 @@ public class ApiController : ControllerBase
             {
                 if (File.codigoMunicipio == "8001000588" || File.codigoMunicipio == "8907020342")
                 {
-                    resultado = controller.ReaderExperimental(body, municipio, File);
+                    if (File.tipo == 1)
+                    {
+                        resultado = controller.ReaderExperimental(body, municipio, File);
+                    }
+                    else
+                    {
+                        resultado = controller.ReaderExperimentalAcuerdos(body, municipio, File);
+                    }
+
                 }
                 else if (File.codigoMunicipio == "8912006863")
                 {
