@@ -113,11 +113,11 @@ namespace API.Controllers
 
                 var cultureInfo = new CultureInfo("co-CO");
 
-                var fecha1 = Convert.ToDateTime(Fechas1[i].ToString());
-                var fecha2 = Convert.ToDateTime(Fechas1[i].ToString());
-                var fecha3 = Convert.ToDateTime(Fechas1[i].ToString());
+                var fecha1 = DateTime.ParseExact(Fechas1[i].ToString(), "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None);
+                var fecha2 = DateTime.ParseExact(Fechas2[i].ToString(), "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None);
+                var fecha3 = DateTime.ParseExact(Fechas3[i].ToString(), "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None);
 
-
+                
                 Tabla2[i] = div[2] + files.separator + Totales1[i] + files.separator + fecha1 + files.separator + Totales2[i] + files.separator + fecha2 + files.separator + Totales3[i] + files.separator + fecha3;
                 ;
             }

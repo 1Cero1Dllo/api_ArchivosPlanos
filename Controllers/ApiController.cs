@@ -24,11 +24,11 @@ public class ApiController : ControllerBase
     }
 
     [HttpGet]
-    [Route("/GetImpuestos")]
-    public IActionResult GetImpuestos()
+    [Route("/GetImpuestosxMunicipio")]
+    public IActionResult GetImpuestos(string codigoMunicipio)
     {
         Connection connection = new();
-        string query = $"SELECT * FROM tblImpuestos";
+        string query = $@"EXEC sp_GetImpuestoxMunicipio '{codigoMunicipio}'";
         var res = connection.Consulta(query);
         string json = JsonConvert.SerializeObject(res);
         return Ok(json);
