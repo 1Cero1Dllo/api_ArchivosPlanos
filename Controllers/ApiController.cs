@@ -31,7 +31,15 @@ public class ApiController : ControllerBase
         string query = $@"EXEC sp_GetImpuestoxMunicipio '{codigoMunicipio}'";
         var res = connection.Consulta(query);
         string json = JsonConvert.SerializeObject(res);
+
+
+        if (res.Data.Rows.Count == 0)
+        {
+            return NotFound(json);
+        }
         return Ok(json);
+
+
     }
 
 

@@ -28,16 +28,16 @@ public class Connection
                 var dataTable = new DataTable();
                 dataTable.Load(reader);
                 res.Data = dataTable;
-                res.Mensaje = $"200 ok";
-                return res;
             }
 
         }
-        catch (System.Exception)
+        catch (System.Exception ex)
         {
             
-            throw;
+            res.Mensaje = ex.Message;
         }
+
+        return res;
     }
     public Respuesta ConsultaTabla(Municipio municipio, string NombreTable)
     {
