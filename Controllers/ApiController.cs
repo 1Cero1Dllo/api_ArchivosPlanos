@@ -88,7 +88,7 @@ public class ApiController : ControllerBase
                 }
                 else
                 {
-                    resultado = controller.ReaderEmpopasto(body, municipio, File);
+                    resultado = controller.ReaderGenerico(body, municipio, File);
                 }
             }
             catch (System.Exception ex)
@@ -105,6 +105,8 @@ public class ApiController : ControllerBase
 
         return Ok(resultado);
     }
+
+    
 
 }
 

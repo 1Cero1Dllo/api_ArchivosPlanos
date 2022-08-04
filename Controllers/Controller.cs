@@ -19,11 +19,21 @@ namespace API.Controllers
         {
             connection.connection(query, archivo.codigoMunicipio);
         }
-
+        public void InsertTemp(string query, DataTable tbl)
+        {
+            connection.connection(query, tbl, archivo.codigoMunicipio);
+        }
+        
         public void Delete(string nombreTable)
         {
             string query = $"DELETE {nombreTable}";
             Insert(query);
+        }
+
+        public void CrearTableTemporal(string nombreTable, DataTable Tbl)
+        {
+
+            InsertTemp(nombreTable, Tbl);
         }
 
         public string ReaderExperimental(string body, Municipio municipio, AttachFile files)
@@ -187,6 +197,7 @@ namespace API.Controllers
             archivo = files;
             var file = body.TrimEnd();
             data = file.Split("\n");
+            
 
             ArrayList tabla1 = new();
             ArrayList tabla2 = new();
@@ -267,18 +278,82 @@ namespace API.Controllers
         {
 
             archivo = files;
+            List<string> codigos = new List<string>();
+            string Tabla = municipio.nombreTable[0].ToString();
+
+            int Columnas = int.Parse(municipio.NoColumnas[0].ToString());
+            var Res = connection.ConsultaTabla(municipio, Tabla);
+            DataTable tbl = Res.Data;
+
+            DataRow dr = tbl.NewRow();
+            if (files.delete == true)
+                Delete(Tabla);
+
+
+            var file = body.TrimEnd();
+            data = file.Split("\n");
+
+            codigos = connection.ConsultaCodigo(municipio, Tabla);
+            List<string> codigosQuery = new List<string>();
+
+            foreach (string line in data)
+            {
+                try
+                {
+                    string[] cols = line.Split(files.separator);
+
+                    dr = tbl.NewRow();
+
+                    for (int i = 0; i < Columnas; i++)
+                    {
+                        if (cols.Length > i)
+                            dr[i] = cols[i].Trim();
+
+                    }
+
+                    tbl.Rows.Add(dr);
+
+                }
+                catch (System.Exception ex)
+                {
+                    connection.InsertException(ex, files.codigoMunicipio);
+                    var cols = line.Split(files.separator);
+                    return ex.Message;
+                }
+
+
+            }
+            try
+            {
+                CrearTableTemporal(Tabla, tbl);
+            }
+            catch (System.Exception ex)
+            {
+                connection.InsertException(ex);
+                return ex.Message;
+            }
+
+
+
+
+
+            return Res.Mensaje;
+        }
+
+        public string ReaderGenerico(string body, Municipio municipio, AttachFile files)
+        {
+
+            archivo = files;
+            string Tabla = municipio.nombreTable[0].ToString();
             if (files.delete == true)
             {
-                Delete(municipio.nombreTable[0].ToString());
+                Delete(Tabla);
             }
             var file = body.TrimEnd();
             data = file.Split("\n");
 
-            var Res = connection.ConsultaTabla(municipio, municipio.nombreTable[0].ToString());
+            var Res = connection.ConsultaTabla(municipio, Tabla);
             DataTable tbl = Res.Data;
-
-
-
 
             foreach (string line in data)
             {
@@ -287,7 +362,7 @@ namespace API.Controllers
                     var cols = line.Split(files.separator);
                     DataRow dr = tbl.NewRow();
 
-                    for (int i = 0; i < int.Parse(municipio.NoColumnas[0].ToString()); i++)
+                    for (int i = 0; i < int.Parse(Tabla); i++)
                     {
                         if (cols.Length > i)
                         {
@@ -307,7 +382,7 @@ namespace API.Controllers
             }
             try
             {
-                connection.BulkInsert(municipio.nombreTable[0].ToString(), tbl);
+                connection.BulkInsert(Tabla, tbl);
             }
             catch (System.Exception ex)
             {
@@ -319,6 +394,4 @@ namespace API.Controllers
             return Res.Mensaje;
         }
     }
-
-
 }
