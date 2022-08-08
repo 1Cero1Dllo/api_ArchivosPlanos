@@ -362,7 +362,7 @@ namespace API.Controllers
                     var cols = line.Split(files.separator);
                     DataRow dr = tbl.NewRow();
 
-                    for (int i = 0; i < int.Parse(Tabla); i++)
+                    for (int i = 0; i < int.Parse(municipio.NoColumnas[0].ToString()); i++)
                     {
                         if (cols.Length > i)
                         {
